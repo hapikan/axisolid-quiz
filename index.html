@@ -7,40 +7,70 @@
     body {
       text-align: center;
       font-family: sans-serif;
-      background: #f0f0f0;
+      background: transparent;
+      position: relative;
     }
+
+    /* 背景画像 */
+    body::before {
+      content: "";
+      background-image: url('images.jpeg');
+      background-size: cover;
+      background-position: center;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: -1;
+      filter: blur(6px) brightness(0.6);
+    }
+
     canvas {
       margin-top: 20px;
     }
+
     #spinBtn {
       margin-top: 20px;
       padding: 10px 20px;
       font-size: 20px;
     }
+
+    #fullscreenBtn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      padding: 8px 14px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.8);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
     #result {
       margin-top: 50px;
       font-size: 36px;
       font-weight: bold;
-      color: #222;
+      color: #fff;
+      text-shadow: 2px 2px 4px #000;
     }
   </style>
 </head>
 <body>
-  <h1>Axisolid どんだけ知ってんねん選手権</h1>
+  <button id="fullscreenBtn">全画面</button>
+  <h1 style="color: white; text-shadow: 1px 1px 3px #000;">Axisolid どんだけ知ってんねん選手権</h1>
   <canvas id="wheel" width="400" height="400"></canvas><br>
   <button id="spinBtn">ルーレットを回す</button>
   <div id="result"></div>
 
-  <!-- 🎵 音声ファイル -->
-  <audio id="bgm" src="02.Galaxian Explosion.m4a" loop></audio>
-  <audio id="tick" src="https://example.com/tick.mp3"></audio>
-  <audio id="fanfare" src="https://example.com/fanfare.mp3"></audio>
+  <!-- 音声ファイル（BGMは削除済） -->
+  <audio id="tick" src="https://soundeffect-lab.info/sound/variety/mp3/roulette1.mp3"></audio>
+  <audio id="fanfare" src="https://soundeffect-lab.info/sound/anime/mp3/fanfare2.mp3"></audio>
 
   <script>
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
     const spinBtn = document.getElementById('spinBtn');
     const result = document.getElementById('result');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
 
     const segments = [
       "好きなミュージシャン",
@@ -123,10 +153,16 @@
       setTimeout(() => isSpinning = false, 8500);
     });
 
-    window.addEventListener('click', () => {
-      const bgm = document.getElementById("bgm");
-      if (bgm) bgm.play();
-    }, { once: true });
+    // 全画面ボタン処理
+    fullscreenBtn.addEventListener('click', () => {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) {
+        document.documentElement.msRequestFullscreen();
+      }
+    });
 
     drawWheel();
   </script>
