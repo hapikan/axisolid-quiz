@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Axisolid どんだけ知ってんねん選手権</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: sans-serif;
+      background: #f0f0f0;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+    #spinBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 20px;
+    }
+    #result {
+      margin-top: 50px;
+      font-size: 36px;
+      font-weight: bold;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <h1>Axisolid どんだけ知ってんねん選手権</h1>
+  <canvas id="wheel" width="400" height="400"></canvas><br>
+  <button id="spinBtn">ルーレットを回す</button>
+  <div id="result"></div>
+
+  <!-- 🎵 音声ファイル -->
+  <audio id="bgm" src="02.Galaxian Explosion.m4a" loop></audio>
+  <audio id="tick" src="https://example.com/tick.mp3"></audio>
+  <audio id="fanfare" src="https://example.com/fanfare.mp3"></audio>
+
+  <script>
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const spinBtn = document.getElementById('spinBtn');
+    const result = document.getElementById('result');
+
+    const segments = [
+      "好きなミュージシャン",
+      "使用楽器メーカー",
+      "血液型は？",
+      "好きな食べ物は？",
+      "乗っている車の車種は？",
+      "楽器幾つ所有している？",
+      "好きな服のブランドは？",
+      "最近買ったちょっと高い買い物は？",
+      "誕生日は？",
+      "身長は？",
+      "好きな映画は？",
+      "利き手は？",
+      "好きな色は？",
+      "嫌いな食べ物は？",
+      "趣味は？(音楽以外)",
+      "ペットは何を飼ってる？"
+    ];
+
+    const colors = Array.from({length: segments.length}, (_, i) =>
+      `hsl(${i * 360 / segments.length}, 70%, 70%)`
+    );
+
+    let startAngle = 0;
+    let arc = Math.PI * 2 / segments.length;
+    let isSpinning = false;
+
+    function drawWheel() {
+      for (let i = 0; i < segments.length; i++) {
+        let angle = startAngle + i * arc;
+        ctx.fillStyle = colors[i];
+        ctx.beginPath();
+        ctx.moveTo(200, 200);
+        ctx.arc(200, 200, 180, angle, angle + arc);
+        ctx.fill();
+      }
+    }
+
+    function rotateWheel(duration = 8000) {
+      const tick = document.getElementById("tick");
+      const fanfare = document.getElementById("fanfare");
+
+      let start = null;
+      let totalRotation = Math.random() * 360 + 1440;
+
+      function animate(timestamp) {
+        if (!start) start = timestamp;
+        const progress = timestamp - start;
+        const angle = easeOut(progress, 0, totalRotation, duration);
+        startAngle = angle * Math.PI / 180;
+        ctx.clearRect(0, 0, 400, 400);
+        drawWheel();
+
+        if (progress < duration) {
+          if (progress % 200 < 50 && tick) tick.play();
+          requestAnimationFrame(animate);
+        } else {
+          const finalDeg = angle % 360;
+          const index = Math.floor((segments.length - (finalDeg / 360) * segments.length)) % segments.length;
+          result.innerText = `お題：「${segments[index]}」`;
+          if (fanfare) fanfare.play();
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function easeOut(t, b, c, d) {
+      t /= d;
+      t--;
+      return c * (t * t * t + 1) + b;
+    }
+
+    spinBtn.addEventListener('click', () => {
+      if (isSpinning) return;
+      isSpinning = true;
+      result.innerText = "";
+      rotateWheel();
+      setTimeout(() => isSpinning = false, 8500);
+    });
+
+    window.addEventListener('click', () => {
+      const bgm = document.getElementById("bgm");
+      if (bgm) bgm.play();
+    }, { once: true });
+
+    drawWheel();
+  </script>
+</body>
+</html>
